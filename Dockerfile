@@ -2,19 +2,23 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
+# system deps (safe)
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# install python deps
 COPY requirements.txt .
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install -r requirements.txt
 
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
+# copy app
 COPY . .
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
+# REQUIRED for Render
+ENV PYTHONUNBUFFERED=1
+
+# IMPORTANT: use $PORT
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
