@@ -4,7 +4,6 @@ Main FastAPI application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.database import engine
 from app.models import Base
 
 # Create tables if they don't exist (for development)
@@ -17,6 +16,7 @@ logger = logging.getLogger(__name__)
 try:
     init_db = os.getenv("INIT_DB", "false").lower() in ("1", "true", "yes")
     if init_db:
+        from app.database import engine
         Base.metadata.create_all(bind=engine)
     else:
         logger.info("Skipping automatic DB creation (production-safe).")
