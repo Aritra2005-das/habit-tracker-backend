@@ -17,7 +17,11 @@ try:
     init_db = os.getenv("INIT_DB", "false").lower() in ("1", "true", "yes")
     if init_db:
         from app.database import engine
-        Base.metadata.create_all(bind=engine)
+        import os
+
+if os.getenv("INIT_DB", "false").lower() == "true":
+    Base.metadata.create_all(bind=engine)
+
     else:
         logger.info("Skipping automatic DB creation (production-safe).")
 except Exception:
